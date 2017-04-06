@@ -9,3 +9,7 @@ if __name__ == '__main__':
 
 foo = True
 foo = False
+
+import pandas as pd
+import numpy as np
+
