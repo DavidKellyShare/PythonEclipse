@@ -5,9 +5,6 @@ Created on Apr 6, 2017
 '''
 
 def CleanData(data):
-    import pandas as pd
-    from sklearn.preprocessing import MinMaxScaler
-
     # Clean Cabin
     CabinId={'A':1,'B':2,'C':3,'D':4,'E':5, '2':0}
     data['CabinType'] = data['Cabin'].str.extract('^([ABCDE]).*', expand=False).apply(lambda x: CabinId.get(x,6))
@@ -29,6 +26,9 @@ def CleanData(data):
     # Clean Age
     #data['Age'].unique()
     #data[data['Age'].isnull()]
+    #
+    # Save mean for subsequent calls
+    #
     data['Age'].fillna(data['Age'].mean(), inplace=True)
     
     # Clean Sex
@@ -44,6 +44,4 @@ def CleanData(data):
     #data['Pclass'].unique()
     
     
-    # Scale Features
-    scaler = MinMaxScaler()
-    return pd.DataFrame(scaler.fit_transform(data), columns=data.columns).as_matrix()
+    
