@@ -7,6 +7,8 @@ import pandas as pd
 import logging as log
 import LearnModel
 
+
+
 class TitanicData():
     '''
     classdocs

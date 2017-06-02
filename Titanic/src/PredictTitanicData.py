@@ -12,40 +12,58 @@ if __name__ == '__main__':
 
     # Read Data
     trainPath = Path('../Data/train.csv')
-    train = pd.read_csv(trainPath, index_col=0)
+    Xtrain = pd.read_csv(trainPath, index_col=0)
     
     # Split data into Cross Validation Train
-    [train, cv] = train_test_split(train, test_size = 0.2)
+    [Xtrain, Xcv] = train_test_split(Xtrain, test_size = 0.2)
     
     # Pull out y
-    yTrain = train['Survived']
-    del train['Survived']
-    yCV = cv['Survived']
-    del cv['Survived']
+    yTrain = Xtrain['Survived']
+    del Xtrain['Survived']
+    ycv = Xcv['Survived']
+    del Xcv['Survived']
     
     # Clean Features
     #
-    CleanTitanicData.CleanData(train)
-    CleanTitanicData.CleanData(cv)
+    CleanTitanicData.CleanData(Xtrain)
+    CleanTitanicData.CleanData(Xcv)
+    
+    # Add Polynomial Features
+    from sklearn.preprocessing import PolynomialFeatures
+    poly = PolynomialFeatures(4)
+    Xtrain = poly.fit_transform(Xtrain)
+    Xcv = poly.transform(Xcv)
     
     # Scale Features
     #
     import ScaleData
     titanicScaler = ScaleData.ScaleData()
-    trainScaled = titanicScaler.fitScaleData(train)
-    cvScaled = titanicScaler.scaleData(cv)
+    Xtrain = titanicScaler.fitScaleData(Xtrain)
+    Xcv = titanicScaler.scaleData(Xcv)
     # pd.DataFrame(scaler.fit_transform(data), columns=data.columns).as_matrix()
 
-    # Train Model
-    from sklearn import svm
-    clf = svm.SVC()
-    clf.fit(trainScaled, yTrain)
-    print(clf)
-    
-    # Cross Validate Model
-    print(clf.predict(cvScaled))
-    print(yCV.values)
-    
+    # Support Vector Machine
+    import Z_LearnSVC
+    svc = Z_LearnSVC.Z_LearnSVC()
+    svc.setrbf()
+    cvScore, cvPredict, cvC = svc.fitC(Xtrain, yTrain, Xcv, ycv) 
+    print(cvScore, cvPredict, cvC)
+
+    # Support Vector Machine
+    svc.setsigmoid()
+    cvScore, cvPredict, cvC = svc.fitC(Xtrain, yTrain, Xcv, ycv) 
+    print(cvScore, cvPredict, cvC)
+
+    # Support Vector Machine
+    #svc.setpoly()
+    #cvScore, cvPredict, cvC = svc.fitC(Xtrain, yTrain, cvScaled, yCV) 
+    #print(cvScore, cvPredict, cvC)
+
+    # Plot Scores
+    #svc.setrbf()
+    print(len(Xtrain), len(yTrain))
+    print(len(Xcv), len(ycv))
+    svc.plotScores(Xtrain, yTrain, Xcv, ycv)
         
     # Test Model
     
